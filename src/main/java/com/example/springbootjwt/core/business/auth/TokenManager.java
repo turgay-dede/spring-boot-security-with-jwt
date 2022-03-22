@@ -11,8 +11,7 @@ import java.util.Date;
 
 @Service
 public class TokenManager {
-
-    Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private String APP_SECRET="ApplicationSecretKeyApplicationSecretKeyApplicationSecretKeyApplicationSecretKeyApplicationSecretKeyApplicationSecretKey";
     private static final int validity = 5 * 60 * 1000;
 
     public String generateToken(String username){
@@ -21,15 +20,11 @@ public class TokenManager {
                 .setIssuer("turgay-dede.com")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+validity))
-                .signWith(key)
-                .compact();
+                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
     }
 
     public boolean tokenValidate(String token){
-        if(getUsernameToken(token) != null && isExpired(token)){
-            return true;
-        }
-        return false;
+        return getUsernameToken(token) != null && isExpired(token);
     }
 
     public String getUsernameToken(String token){
@@ -43,7 +38,6 @@ public class TokenManager {
     }
 
     private Claims getClaims(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        return claims;
+        return Jwts.parserBuilder().setSigningKey(APP_SECRET).build().parseClaimsJws(token).getBody();
     }
 }

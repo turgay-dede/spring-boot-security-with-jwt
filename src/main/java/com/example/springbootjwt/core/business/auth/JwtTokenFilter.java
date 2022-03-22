@@ -1,6 +1,5 @@
 package com.example.springbootjwt.core.business.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,8 +15,12 @@ import java.util.ArrayList;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
-    @Autowired
-    TokenManager tokenManager;
+
+    private final TokenManager tokenManager;
+
+    public JwtTokenFilter(TokenManager tokenManager) {
+        this.tokenManager = tokenManager;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -40,10 +43,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(username,null,new ArrayList<>());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
         filterChain.doFilter(request,response);
-
     }
 }
